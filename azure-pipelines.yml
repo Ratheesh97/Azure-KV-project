@@ -6,15 +6,15 @@ pool:
 
 steps:
 - script: |
-    echo "Installing Terraform manually..."
-    wget -O- https://hashicorp.com | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-    sudo apt-get update && sudo apt-get install terraform -y
-  displayName: 'Install Terraform'
+    echo "Directly installing terraform via official snap package..."
+    sudo snap install terraform --classic
+    
+    echo "Checking installation..."
+    terraform --version
+  displayName: 'Install Terraform via Snap'
 
 - script: |
     echo "Running Terraform Commands..."
-    terraform --version
     terraform init
     terraform plan
   displayName: 'Terraform Init and Plan'
