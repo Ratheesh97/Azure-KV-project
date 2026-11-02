@@ -5,16 +5,28 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+# 1. டெர்ராபார்ம் இன்ஸ்டால் செய்தல்
 - script: |
     echo "Directly installing terraform via official snap package..."
     sudo snap install terraform --classic
-    
-    echo "Checking installation..."
     terraform --version
   displayName: 'Install Terraform via Snap'
 
-- script: |
-    echo "Running Terraform Commands..."
-    terraform init
-    terraform plan
-  displayName: 'Terraform Init and Plan'
+# 2. அஸூர் சர்வீஸ் கனெக்ஷன் மூலமாக டெர்ராபார்ம் இயக்குதல்
+- task: AzureCLI@2
+  displayName: 'Terraform Init and Plan via Azure'
+  inputs:
+    azureSubscription: 'azure-free-conn' # நீங்கள் உருவாக்கிய Service Connection பெயர்
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      echo "Running Terraform Commands..."
+      
+      # அஸூர் லாகின் விவரங்களை டெர்ராபார்ம் எடுத்துக்கொள்ளும்
+      export ARM_CLIENT_ID=$servicePrincipalId
+      export ARM_CLIENT_SECRET=$servicePrincipalKey
+      export ARM_TENANT_ID=$tenantId
+      export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+      
+      terraform init
+      terraform plan
